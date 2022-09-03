@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<!-- 은영 (배송현황 관련) -->
+	<entry key="deliveryStatusList">
+		<!-- 배송 현황에 따른 주문상품들 조회시 실행할 sql문 -->
+		SELECT 
+		       MEM_ID
+		     , ORDER_NO
+		     , PRODUCT_NAME
+		     , ORDER_QUENTITY
+		     , ORDER_DATE
+		     , TOTAL_PRICE
+		     , DELIVERY_STATUS
+		     , SELLER
+		     , SELLER_PHONE
+		FROM ORDER_PRO
+		JOIN MEMBER USING (MEM_NO)
+		JOIN ORDER_LIST USING (ORDER_NO)
+		JOIN PRODUCT USING (PRODUCT_CODE)
+		WHERE DELIVERY_STATUS = ? <!-- 배송 현황 -->
+		  AND MEM_ID = ? <!-- 주문자 아이디 -->
+	</entry>
+	
+	<!-- 은영(배송에 따른 주문 수량를 한꺼번에 실행할 코드) -->
+	<entry key="countOrder">
+        SELECT 
+            M.MEM_ID,
+            (SELECT COUNT(*) 
+            	FROM BASKET B 
+             	WHERE M.MEM_NO = B.MEM_NO) AS BASKET, <!-- 장바구니 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO ) AS CONFIRM, <!-- 구매확정 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO 
+            		AND ORDER_STATUS = 2
+            		AND DELIVERY_STATUS = '구매취소') AS CANCEL, <!-- 구매취소 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO 
+            		AND DELIVERY_STATUS = '상품준비중'
+            		AND ORDER_STATUS != 2) AS READY, <!-- 상품준비중 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO 
+            		AND DELIVERY_STATUS = '배송중') AS TRANSIT, <!-- 배송중 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO 
+            		AND DELIVERY_STATUS = '배송완료') AS DELIVERED <!-- 배송완료 -->
+            FROM MEMBER M 
+        WHERE MEM_ID = ? <!-- 로그인한 회원 아이디 -->
+	</entry>
+	
+	<!-- 은영 (마이페이지에서 밀키트 리뷰 중 최신게시글 2개 조회) -->
+	<entry key="selectNewProductReview">
+	  SELECT ROWNUM, A.*
+		    FROM (
+		            SELECT MEM_ID
+		                 , PRODUCT_NAME
+		                 , SCRAP_COUNT
+		                 , PR_REVIEW_ENROLLDATE "REVIEW_ENROLLDATE"
+		             FROM PRODUCT_REVIEW
+		             JOIN MEMBER ON (MEM_NO = REVIEW_WRITER)
+		             JOIN PRODUCT USING (PRODUCT_CODE)
+		             WHERE MEM_ID = ? <!-- 로그인한 회원 아이디 -->
+		             ORDER BY PR_REVIEW_ENROLLDATE DESC
+		             ) A
+      WHERE ROWNUM BETWEEN 1 AND 2
+	</entry>
+	
+	<!-- 은영 (마이페이지에서 주문상세 내역 중 최신 2개 조회) -->
+	<entry key="selectNewOrder">
+		SELECT ROWNUM, A.* 
+		    FROM (
+		        SELECT PRODUCT_NAME
+		             , TOTAL_PRICE
+		             , ORDER_DATE
+		             , DELIVERY_STATUS
+		             , ORDER_STATUS
+		        FROM ORDER_PRO
+		        JOIN MEMBER USING (MEM_NO)
+		        JOIN ORDER_LIST USING (ORDER_NO)
+		        JOIN PRODUCT USING (PRODUCT_CODE)
+		        WHERE MEM_ID = ? <!-- 로그인한 회원 아이디 -->
+		        ORDER BY ORDER_DATE DESC
+		         ) A
+		WHERE ROWNUM BETWEEN 1 AND 2
+	</entry>
+	
+	<!-- 성범 (밀키트 목록상품 조회) -->
+	<entry key="selectList">
+		SELECT
+			   PRODUCT_CODE 
+		     , PRODUCT_NAME
+		     , PRICE
+		     , IMG_PATH
+		  FROM PRODUCT
+	</entry>
+	
+	
+	<!-- 성범 (배송지입력에서 주문자 정보사항 insert -->
+	<entry key="insertAp">
+		INSERT
+		  INTO DELIVERY
+		  (
+		    DEL_NAME
+		  , DEL_PHONE
+		  , DEL_EMAIL
+		  , DEL_ADDRESS
+		  , DEL_REQUEST
+		  )
+		  VALUES
+		  (
+		    ?
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  )
+		  
+	</entry>
+	
+	<!-- 은영 (장바구니 담은 '월'만 조회) -->
+	<entry key="selectMonth">
+		SELECT 
+		   TO_CHAR(BASKET_DATE, 'YYYY.MM') "MONTH" 
+		FROM BASKET
+		JOIN MEMBER USING (MEM_NO)
+		WHERE MEM_ID = ? <!-- 로그인한 회원 아이디 -->
+		GROUP BY TO_CHAR(BASKET_DATE, 'YYYY.MM')
+		ORDER BY MONTH DESC
+	</entry>
+	
+	<!-- 은영 (장바구니 목록 조회) -->
+	<entry key="selectBasketList">
+      SELECT 
+		     MEM_ID
+		   , PRODUCT_NAME
+		   , PRODUCT_CODE
+		   , TO_CHAR(BASKET_DATE, 'YYYY.MM') "MONTH" 
+		   , BASKET_DATE
+		   , BASKET_NO
+		   , AMOUNT
+		   , PRICE * AMOUNT "PRICE"
+		   , SELLER
+		   , SELLER_PHONE
+		FROM BASKET
+		JOIN MEMBER USING (MEM_NO)
+		JOIN PRODUCT USING (PRODUCT_CODE)
+		WHERE MEM_ID = ?
+		ORDER BY BASKET_DATE DESC
+	</entry>
+	
+	<!-- 은영 (상품 주문한 '월'만 조회) -->
+	<entry key="selectOrderMonth">
+		SELECT 
+		   TO_CHAR(ORDER_DATE, 'YYYY.MM') "MONTH" 
+		FROM ORDER_PRO
+		JOIN MEMBER USING (MEM_NO)
+		WHERE MEM_ID = ? <!-- 로그인한 회원 아이디 -->
+		  AND DELIVERY_STATUS = ? <!-- 배송현황 -->
+		GROUP BY TO_CHAR(ORDER_DATE, 'YYYY.MM')
+		ORDER BY MONTH DESC
+	</entry>
+	
+	<!-- 은영 (배송현황에 따른 주문목록 조회) -->
+	<entry key="selectOrderList">
+		SELECT 
+			OP.ORDER_NO "ORDER_NO"
+		  , TO_CHAR(ORDER_DATE, 'YYYY.MM') "MONTH"
+		  , ORDER_DATE
+		  , ORDER_QUENTITY
+		  , ORDER_STATUS
+		  , DELIVERY_STATUS
+		  , PRODUCT_NAME
+		  , P.PRODUCT_CODE "PRODUCT_CODE"
+		  , TOTAL_PRICE + DELIVERY_PRICE "TOTAL_PRICE"
+		  , SELLER
+		  , SELLER_PHONE
+		FROM ORDER_PRO OP
+		JOIN MEMBER USING (MEM_NO)
+		JOIN ORDER_LIST OL ON (OP.ORDER_NO = OL.ORDER_NO)
+		JOIN PRODUCT P ON (OL.PRODUCT_CODE = P.PRODUCT_CODE)
+		WHERE MEM_ID =  ? <!-- 로그인한 회원 아이디 -->
+		  AND DELIVERY_STATUS = ? <!-- 배송현황 -->
+		ORDER BY ORDER_DATE DESC
+	</entry>
+
+	<!-- 성범 (밀키트 상세페이지에 들어갈 데이터 조회) -->
+	<entry key="detailProduct">
+		SELECT
+			   PRODUCT_CODE
+		     , PRODUCT_NAME
+		     , PRICE
+		     , ENROLL_DATE
+		     , SELLER
+		     , SELLER_PHONE
+		     , SALES_UNIT
+		     , CAPACITY
+		     , PACKING
+		     , ALLERGY
+		     , EXPIRATION_DATE
+		     , IMG_PATH
+		  FROM PRODUCT
+		WHERE PRODUCT_CODE = ?
+	</entry>
+	
+	<!-- 은영 (구매보류 => 구매확정으로 변경) -->
+	<entry key="updatePurchaseConfirm">
+		UPDATE ORDER_PRO
+	    	SET ORDER_STATUS = 1 <!-- 구매확정 -->
+	    WHERE ORDER_NO = ? <!-- 구매번호 -->
+	</entry>
+
+	
+	<!-- 은영 (구매보류 => 구매취소로 변경) -->
+	<entry key="updatePurchaseCancel">
+		UPDATE ORDER_PRO
+	    	SET ORDER_STATUS = 2 <!-- 구매확정 -->
+	    	  , DELIVERY_STATUS = '구매취소' <!-- 배송현황 -->
+	    WHERE ORDER_NO = ? <!-- 구매번호 -->
+	</entry>
+
+	
+
+	<!-- 성범 (밀키트 상세페이지 리뷰에 INSERT) -->
+	<entry key="insertReview">
+		INSERT
+		  INTO PRODUCT_REVIEW
+		  (
+		    REVIEW_NO
+		  , PR_REVIEW_CONTENT
+		  , PRODUCT_CODE
+		  , REVIEW_WRITER
+		  , PR_REVIEW_RATE 
+		  )
+		  VALUES
+		  (
+		    SEQ_REPNO.NEXTVAL
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  )
+	</entry>
+	
+	<!-- 성범 (밀키트 상세페이지 리뷰에 select -->
+	<entry key="selectReview">
+		SELECT
+		       REVIEW_NO
+		     , PR_REVIEW_CONTENT
+		     , MEM_ID
+		     , PR_REVIEW_RATE 
+		  FROM PRODUCT_REVIEW R
+		  JOIN MEMBER ON (REVIEW_WRITER=MEM_NO)
+		 WHERE R.PR_REVIEW_STATUE = 'N'
+		   AND PRODUCT_CODE = ?
+		 ORDER
+		    BY REVIEW_NO DESC
+	</entry>
+
+	
+	<!-- 은영 (주문 전체 리스트 '월'만 조회) -->
+	<entry key="selectAllOrderMonth">
+		SELECT 
+		   TO_CHAR(ORDER_DATE, 'YYYY.MM') "MONTH" 
+		FROM ORDER_PRO
+		JOIN MEMBER USING (MEM_NO)
+		WHERE MEM_ID = ? <!-- 로그인한 회원 아이디 -->
+		GROUP BY TO_CHAR(ORDER_DATE, 'YYYY.MM')
+		ORDER BY MONTH DESC
+	</entry>
+
+	<!-- 은영 (주문 전체 리스트 조회) -->
+	<entry key="selectAllOrderList">
+		SELECT 
+			OP.ORDER_NO "ORDER_NO"
+		  , TO_CHAR(ORDER_DATE, 'YYYY.MM') "MONTH"
+		  , ORDER_DATE
+		  , ORDER_QUENTITY
+		  , ORDER_STATUS
+		  , DELIVERY_STATUS
+		  , PRODUCT_NAME
+		  , P.PRODUCT_CODE "PRODUCT_CODE"
+		  , TOTAL_PRICE + DELIVERY_PRICE "TOTAL_PRICE"
+		  , SELLER
+		  , SELLER_PHONE
+		FROM ORDER_PRO OP
+		JOIN MEMBER USING (MEM_NO)
+		JOIN ORDER_LIST OL ON (OP.ORDER_NO = OL.ORDER_NO)
+		JOIN PRODUCT P ON (OL.PRODUCT_CODE = P.PRODUCT_CODE)
+		WHERE MEM_ID =  ? <!-- 로그인한 회원 아이디 -->
+		ORDER BY ORDER_DATE DESC
+	</entry>
+
+	<!-- 성범 (밀키트 주문시 배송지정보 입력 INSERT) -->
+	<entry key="insertAddress">
+		INSERT
+		  INTO ORDER_PRO
+		  (
+		    ORDER_NO
+		  , MEM_NO
+		  , ORDER_QUENTITY
+		  , ORDER_DATE
+		  , MEMO
+		  , MODIFY_DATE
+		  , ORDER_STATUS
+		  , TOTAL_PRICE
+		  , DELIVERY_PRICE
+		  , PAYMENT
+          , DELIVERY_STATUS
+          , DELIVERY_TYPE
+          , DEL_NAME
+		  , DEL_PHONE
+		  , DEL_EMAIL
+          , DEL_ADDRESS
+          , DEL_ADDRESS_CODE
+          , DEL_ADDRESS_DETAIL
+          , DEL_ADDRESS_REF
+		  )
+		  VALUES
+		  (
+		    SEQ_ORDERNO.NEXTVAL
+		  , ?	<!-- 1. MEM_NO -->
+		  , ?	<!-- 2. ORDER_QUENTITY -->
+		  , SYSDATE	<!-- ORDER_DATE -->
+		  , ?	<!-- 3. MEMO -->
+          , SYSDATE	<!-- MODIFY_DATE -->
+          , 1	<!-- ORDER_STATUS -->
+          , ?	<!-- 4. TOTAL_PRICE -->
+          , 2500	<!-- DELIVERY_PRICE -->
+          , '카드'	<!-- PAYMENT -->
+          , DEFAULT	<!-- DELIVERY_STATUS -->
+          , ?	<!-- DELIVERY_TYPE -->
+          , ?	<!-- 5. DEL_NAME -->
+          , ?	<!-- 6. DEL_PHONE -->
+          , ?	<!-- 7. DEL_EMAIL -->
+          , ?	<!-- 8. DEL_ADDRESS -->
+          , ?	<!-- 9. DEL_ADDRESS_CODE -->
+          , ?	<!-- 10. DEL_ADDRESS_DETAIL -->
+          , ?	<!-- 11. DEL_ADDRESS_REF -->
+		  )
+
+	</entry>
+	
+	<!-- 은영 (주문 상세 페이지 조회시 실행할 sql문) -->
+	<entry key="selectOrderDetail">
+		SELECT ORDER_NO
+		     , ORDER_DATE
+		     , PRODUCT_CODE
+		     , PRODUCT_NAME
+		     , ORDER_QUENTITY
+		     , TOTAL_PRICE
+		     , DELIVERY_PRICE
+		     , DISCOUNT_FEE
+		     , TOTAL_PRICE + DELIVERY_PRICE - DISCOUNT_FEE "TOTAL"
+		     , SELLER
+		     , SELLER_PHONE
+		     , DELIVERY_STATUS
+		     , DEL_NAME
+		     , DEL_PHONE
+		     , DEL_EMAIL
+		     , DEL_ADDRESS_CODE
+		     , DEL_ADDRESS
+		     , DEL_ADDRESS_DETAIL
+		     , DEL_ADDRESS_REF
+		     , MEMO
+		     , MEM_NAME
+		     , MEM_PHONE
+		FROM ORDER_PRO
+		JOIN ORDER_LIST USING (ORDER_NO)
+		JOIN PRODUCT USING (PRODUCT_CODE)
+		JOIN MEMBER USING (MEM_NO)
+		WHERE MEM_ID = ? <!-- 로그인한 회원 아이디 -->
+		 AND ORDER_NO = ? <!-- 주문번호 -->
+	</entry>
+	
+	<!-- 성범 (밀키트 상세페이지에서 장바구니 담기 INSERT) -->
+	<entry key="insertCart">
+		INSERT
+			  INTO BASKET
+			  (
+			    MEM_NO
+			  , PRODUCT_CODE
+			  , AMOUNT
+	          , BASKET_DATE
+	          , BASKET_NO
+			  )
+			  VALUES
+			  (
+			    ?
+			  , ?
+			  , ?
+			  , SYSDATE
+			  , SEQ_BNO.NEXTVAL
+			  )
+	
+	</entry>
+	
+	<!-- 성범  -->
+	<entry key="selectmealkit">
+		SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+		                SELECT 
+		                       PRODUCT_CODE
+                             , PRODUCT_NAME
+                             , PRICE
+                             , IMG_PATH
+		                   FROM PRODUCT
+                          ORDER
+                             BY PRODUCT_CODE DESC
+		               ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<!-- 성범  -->
+	<entry key="selectListCount">
+		SELECT COUNT(*) as "COUNT"
+		  FROM PRODUCT
+	</entry>
+	
+	<!-- 성범  -->
+	<entry key="insertProduct">
+		INSERT
+		  INTO PRODUCT
+		  (
+		  PRODUCT_CODE
+        , PRODUCT_NAME
+        , PRICE
+        , ENROLL_DATE
+        , SELLER
+        , SELLER_PHONE
+        , SALES_UNIT
+        , CAPACITY
+        , PACKING
+        , ALLERGY
+        , EXPIRATION_DATE
+        , IMG_PATH
+		  )
+		  VALUES
+		  (
+			SEQ_PRNO.NEXTVAL		   
+		  , ?  
+		  , ?
+		  , SYSDATE
+		  , ?
+          , ?
+          , ?
+          , ?
+          , ?
+          , ?
+          , ?
+          , ?
+		  )
+
+	</entry>
+	
+	<!-- 혜림 (밀키트 리뷰 삭제) -->
+	<entry key="deleteReview">
+		UPDATE
+		       PRODUCT_REVIEW
+		   SET PR_REVIEW_STATUE = 'Y'
+	</entry>
+	
+	<!-- 은영 (장바구니 삭제) -->
+	<entry key="deleteBasket">
+	DELETE FROM BASKET
+        
+	</entry>
+	
+	<!--  성범 -->
+	<entry key="cartPay">
+      SELECT 
+             MEM_NO
+           , PRODUCT_CODE
+           , AMOUNT
+           , BASKET_DATE
+           , PRICE
+           , PRODUCT_NAME
+        FROM BASKET
+        JOIN PRODUCT USING(PRODUCT_CODE)
+       WHERE BASKET_NO = ?
+   </entry>
+	
+	
+	
+	
+	
+	
+	
+</properties>

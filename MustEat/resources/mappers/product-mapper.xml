@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="productMapper">
+
+	<resultMap id="productResultSet" type="Product">
+			<result column="CONFIRM" property="orderConfirm" />
+			<result column="CANCEL" property="orderCancel" />
+			<result column="READY" property="orderReady" />
+			<result column="TRANSIT" property="orderTransit" />
+			<result column="DELIVERED" property="orderDelivered" />		
+			<result column="M.MEM_ID" property="memId" />
+			<result column="PRODUCT_NAME" property="productName" />
+			<result column="TOTAL_PRICE" property="totalPrice" />
+			<result column="ORDER_DATE" property="orderDate" />
+			<result column="DELIVERY_STATUS" property="deliveryStatus" />
+			<result column="ORDER_STATUS" property="orderStatus" />
+			<result column="PRICE" property="price" />
+			<collection property="count" resultMap="basketResultSet" />
+	</resultMap>
+	
+	<resultMap id="orderProResultSet" type="OrderPro">
+			<result column="CONFIRM" property="orderConfirm" />
+			<result column="BASKET" property="basket" />
+			<result column="CANCEL" property="orderCancel" />
+			<result column="READY" property="orderReady" />
+			<result column="TRANSIT" property="orderTransit" />
+			<result column="DELIVERED" property="orderDelivered" />		
+			<result column="M.MEM_ID" property="memId" />
+			<result column="PRODUCT_NAME" property="productName" />
+			<result column="TOTAL_PRICE" property="totalPrice" />
+			<result column="TOTAL" property="totalPrice" />
+			<result column="ORDER_DATE" property="orderDate" />
+			<result column="DELIVERY_STATUS" property="deliveryStatus" />
+			<result column="ORDER_STATUS" property="orderStatus" />
+			<result column="MONTH" property="orderMonth" />
+			<result column="ORDER_NO" property="orderNo" />
+			<result column="ORDER_QUENTITY" property="orderQuentity"/>
+			<result column="PRODUCT_CODE" property="productCode" />
+			<result column="SELLER" property="seller" />
+		    <result column="SELLER_PHONE" property="sellerPhone" />
+	</resultMap>
+	
+	<resultMap id="orderDetailResultSet" type="OrderDetail">
+			<result column="ORDER_NO" property="orderNo" />
+			<result column="ORDER_DATE" property="orderDate" />
+			<result column="PRODUCT_CODE" property="productCode" />
+			<result column="PRODUCT_NAME" property="productName" />
+			<result column="ORDER_QUENTITY" property="amount"/>
+			<result column="TOTAL_PRICE" property="price" />
+			<result column="DELIVERY_PRICE" property="deliveryPrice" />
+		    <result column="DISCOUNT_FEE" property="discountPrice" />
+		    <result column="TOTAL" property="totalPrice" />
+		    <result column="SELLER" property="seller" />
+		    <result column="SELLER_PHONE" property="sellerPhone" />
+		    <result column="DELIVERY_STATUS" property="deliveryStatus" />
+		    <result column="DEL_NAME" property="delName" />
+		    <result column="DEL_PHONE" property="delPhone" />
+		    <result column="DEL_EMAIL" property="delEmail" />
+		    <result column="DEL_ADDRESS_CODE" property="addressCode" />
+		    <result column="DEL_ADDRESS" property="address" />
+		    <result column="DEL_ADDRESS_DETAIL" property="addressDetail" />
+		    <result column="DEL_ADDRESS_REF" property="addressRef" />
+		    <result column="MEMO" property="memo" />
+		    <result column="MEM_NAME" property="memName" />
+		    <result column="MEM_PHONE" property="memPhone" />
+	</resultMap>
+	
+	<resultMap id="basketResultSet" type="Basket">
+		<result column="BASKET" property="count" />
+		<result column="MONTH" property="month" />
+		<result column="PRODUCT_NAME" property="productName" />
+		<result column="PRODUCT_CODE" property="productCode" />
+		<result column="BASKET_DATE" property="basketDate" />
+		<result column="BASKET_NO" property="basketNo" />
+		<result column="AMOUNT" property="count" />
+		<result column="PRICE" property="price" />
+		<result column="SELLER" property="seller" />
+		<result column="SELLER_PHONE" property="sellerPhone" />
+		<result column="BASKET_NO" property="basketNo" />
+	</resultMap>
+	
+	<resultMap id="productReviewResultSet" type="ProductReview">
+		<result column="MEM_ID" property="reviewWriter" />
+		<result column="PRODUCT_NAME" property="productName" />
+		<result column="SCRAP_COUNT" property="scrapCount" />
+		<result column="REVIEW_ENROLLDATE" property="prReviewEnrollDate" />
+	</resultMap>
+
+	<select id="countOrder" parameterType="OrderPro" resultMap="orderProResultSet">
+		SELECT 
+            M.MEM_ID,
+            (SELECT COUNT(*) 
+            	FROM BASKET B 
+             	WHERE M.MEM_NO = B.MEM_NO) AS BASKET, <!-- 장바구니 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO ) AS CONFIRM, <!-- 구매확정 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO 
+            		AND ORDER_STATUS = 2
+            		AND DELIVERY_STATUS = '구매취소') AS CANCEL, <!-- 구매취소 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO 
+            		AND DELIVERY_STATUS = '상품준비중'
+            		AND ORDER_STATUS != 2) AS READY, <!-- 상품준비중 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO 
+            		AND DELIVERY_STATUS = '배송중') AS TRANSIT, <!-- 배송중 -->
+            (SELECT COUNT(*) 
+            	FROM ORDER_PRO O 
+            		WHERE M.MEM_NO = O.MEM_NO 
+            		AND DELIVERY_STATUS = '배송완료') AS DELIVERED <!-- 배송완료 -->
+            FROM MEMBER M 
+        WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+	</select>
+	
+	<select id="selectNewOrder" parameterType="OrderPro" resultMap="orderProResultSet">
+		SELECT ROWNUM, A.* 
+		    FROM (
+		        SELECT PRODUCT_NAME
+		             , TOTAL_PRICE
+		             , ORDER_DATE
+		             , DELIVERY_STATUS
+		             , ORDER_STATUS
+		        FROM ORDER_PRO
+		        JOIN MEMBER USING (MEM_NO)
+		        JOIN ORDER_LIST USING (ORDER_NO)
+		        JOIN PRODUCT USING (PRODUCT_CODE)
+		        WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+		        ORDER BY ORDER_DATE DESC
+		         ) A
+		WHERE ROWNUM BETWEEN 1 AND 2
+	</select>
+	
+	<select id="selectNewProductReview" parameterType="ProductReview" resultMap="productReviewResultSet">
+		  SELECT ROWNUM, A.*
+			    FROM (
+			            SELECT MEM_ID
+			                 , PRODUCT_NAME
+			                 , SCRAP_COUNT
+			                 , PR_REVIEW_ENROLLDATE "REVIEW_ENROLLDATE"
+			             FROM PRODUCT_REVIEW
+			             JOIN MEMBER ON (MEM_NO = REVIEW_WRITER)
+			             JOIN PRODUCT USING (PRODUCT_CODE)
+			             WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+			             ORDER BY PR_REVIEW_ENROLLDATE DESC
+			             ) A
+	      WHERE ROWNUM BETWEEN 1 AND 2
+	</select>
+	
+	<select id="selectMonth" parameterType="Basket" resultMap="basketResultSet">
+		 SELECT 
+		   TO_CHAR(BASKET_DATE, 'YYYY.MM') "MONTH" 
+			FROM BASKET
+		 JOIN MEMBER USING (MEM_NO)
+		 WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+		 GROUP BY TO_CHAR(BASKET_DATE, 'YYYY.MM')
+		 ORDER 
+		 	BY MONTH DESC
+	</select>
+	
+	<select id="selectBasketList" parameterType="Basket" resultMap="basketResultSet">
+		SELECT 
+		     MEM_ID
+		   , PRODUCT_NAME
+		   , PRODUCT_CODE
+		   , TO_CHAR(BASKET_DATE, 'YYYY.MM') "MONTH" 
+		   , BASKET_DATE
+		   , BASKET_NO
+		   , AMOUNT
+		   , PRICE * AMOUNT "PRICE"
+		   , SELLER
+		   , SELLER_PHONE
+		FROM BASKET
+		JOIN MEMBER USING (MEM_NO)
+		JOIN PRODUCT USING (PRODUCT_CODE)
+		WHERE MEM_ID = #{memId}
+		ORDER BY BASKET_DATE DESC
+	</select>
+	
+	<select id="selectOrderMonth" parameterType="OrderPro" resultMap="orderProResultSet">
+		SELECT 
+		   TO_CHAR(ORDER_DATE, 'YYYY.MM') "MONTH" 
+		FROM ORDER_PRO
+		JOIN MEMBER USING (MEM_NO)
+		WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+		  AND DELIVERY_STATUS = #{deliveryStatus} <!-- 배송현황 -->
+		GROUP BY TO_CHAR(ORDER_DATE, 'YYYY.MM')
+		ORDER BY MONTH DESC
+	</select>
+	
+	<select id="selectOrderList" parameterType="OrderPro" resultMap="orderProResultSet">
+		SELECT 
+			OP.ORDER_NO "ORDER_NO"
+		  , TO_CHAR(ORDER_DATE, 'YYYY.MM') "MONTH"
+		  , ORDER_DATE
+		  , ORDER_QUENTITY
+		  , ORDER_STATUS
+		  , DELIVERY_STATUS
+		  , PRODUCT_NAME
+		  , P.PRODUCT_CODE "PRODUCT_CODE"
+		  , TOTAL_PRICE + DELIVERY_PRICE "TOTAL_PRICE"
+		  , SELLER
+		  , SELLER_PHONE
+		FROM ORDER_PRO OP
+		JOIN MEMBER USING (MEM_NO)
+		JOIN ORDER_LIST OL ON (OP.ORDER_NO = OL.ORDER_NO)
+		JOIN PRODUCT P ON (OL.PRODUCT_CODE = P.PRODUCT_CODE)
+		WHERE MEM_ID =  #{memId} <!-- 로그인한 회원 아이디 -->
+		  AND DELIVERY_STATUS = #{deliveryStatus} <!-- 배송현황 -->
+		ORDER BY ORDER_DATE DESC
+	</select>
+	
+	<select id="selectAllOrderMonth" parameterType="OrderPro" resultMap="orderProResultSet">
+		SELECT 
+		   TO_CHAR(ORDER_DATE, 'YYYY.MM') "MONTH" 
+		FROM ORDER_PRO
+		JOIN MEMBER USING (MEM_NO)
+		WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+		GROUP BY TO_CHAR(ORDER_DATE, 'YYYY.MM')
+		ORDER BY MONTH DESC
+	</select>
+	
+	<select id="selectAllOrderList" parameterType="OrderPro" resultMap="orderProResultSet">
+		SELECT 
+			OP.ORDER_NO "ORDER_NO"
+		  , TO_CHAR(ORDER_DATE, 'YYYY.MM') "MONTH"
+		  , ORDER_DATE
+		  , ORDER_QUENTITY
+		  , ORDER_STATUS
+		  , DELIVERY_STATUS
+		  , PRODUCT_NAME
+		  , P.PRODUCT_CODE "PRODUCT_CODE"
+		  , TOTAL_PRICE + DELIVERY_PRICE "TOTAL_PRICE"
+		  , SELLER
+		  , SELLER_PHONE
+		FROM ORDER_PRO OP
+		JOIN MEMBER USING (MEM_NO)
+		JOIN ORDER_LIST OL ON (OP.ORDER_NO = OL.ORDER_NO)
+		JOIN PRODUCT P ON (OL.PRODUCT_CODE = P.PRODUCT_CODE)
+		WHERE MEM_ID =  #{memId} <!-- 로그인한 회원 아이디 -->
+		ORDER BY ORDER_DATE DESC
+	</select>
+	
+	<delete id="deleteBasket" parameterType="_int">
+		DELETE FROM BASKET
+			<where>
+				<foreach item="basketNo" index="i" collection="list"
+					open="BASKET_NO IN (" separator="," close=")">
+					#{basketNo}
+				</foreach>
+			</where>
+	</delete>
+	
+	<update id="updatePurchaseConfirm" parameterType="_int">
+		UPDATE ORDER_PRO
+	    	SET ORDER_STATUS = 1 <!-- 구매확정 -->
+	    WHERE ORDER_NO = #{orderNo} <!-- 구매번호 -->
+	</update>
+	
+	<update id="updatePurchaseCancel" parameterType="_int">
+		UPDATE ORDER_PRO
+	    	SET ORDER_STATUS = 2 <!-- 구매확정 -->
+	    	  , DELIVERY_STATUS = '구매취소' <!-- 배송현황 -->
+	    WHERE ORDER_NO = #{orderNo} <!-- 구매번호 -->
+	</update>
+	
+	<select id="selectOrderDetail" parameterType="OrderDetail" resultMap="orderDetailResultSet">
+		SELECT ORDER_NO
+		     , ORDER_DATE
+		     , PRODUCT_CODE
+		     , PRODUCT_NAME
+		     , ORDER_QUENTITY
+		     , TOTAL_PRICE
+		     , DELIVERY_PRICE
+		     , DISCOUNT_FEE
+		     , TOTAL_PRICE + DELIVERY_PRICE - DISCOUNT_FEE "TOTAL"
+		     , SELLER
+		     , SELLER_PHONE
+		     , DELIVERY_STATUS
+		     , DEL_NAME
+		     , DEL_PHONE
+		     , DEL_EMAIL
+		     , DEL_ADDRESS_CODE
+		     , DEL_ADDRESS
+		     , DEL_ADDRESS_DETAIL
+		     , DEL_ADDRESS_REF
+		     , MEMO
+		     , MEM_NAME
+		     , MEM_PHONE
+		FROM ORDER_PRO
+		JOIN ORDER_LIST USING (ORDER_NO)
+		JOIN PRODUCT USING (PRODUCT_CODE)
+		JOIN MEMBER USING (MEM_NO)
+		WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+		 AND ORDER_NO = #{orderNo} <!-- 주문번호 -->
+	</select>
+
+</mapper>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="memberMapper">
+
+	<resultMap id="memberResultSet" type="Member">
+		<result column="MEM_NO" property="memNo" />
+		<result column="MEM_ID" property="memId" />
+		<result column="MEM_PWD" property="memPwd" />
+		<result column="MEM_NAME" property="memName" />
+		<result column="MEM_PHONE" property="memPhone" />
+		<result column="MEM_EMAIL" property="memEmail" />
+		<result column="MEM_ENROLLDATE" property="enrollDate" />
+		<result column="MEM_STATUS" property="memStatus" />
+		<result column="MEM_NICKNAME" property="memNickname" />
+		<result column="MEM_GRADE" property="memGrade" />
+		<result column="ADDRESS_CODE" property="addressCode" />
+		<result column="ADDRESS" property="address" />	
+		<result column="ADDRESS_DETAIL" property="addressDetail" />
+		<result column="ADDRESS_REF" property="addressRef" />
+		<result column="MEM_IMGPATH" property="memImgPath" />
+		<result column="WITHDRAW" property="withDraw" />
+ 	</resultMap>
+ 	
+ 	<resultMap id="pointResultSet" type="Point">
+ 		<result column="MEM_ID" property="memId" />
+ 		<result column="MPS_CATEGORY" property="mpsCategory" />
+ 		<result column="MPS_RECORD" property="mpsRecord" />
+ 		<result column="MPS_STATUS" property="mpsStatus" />
+ 		<result column="SU_DATE" property="suDate" />
+ 	</resultMap>
+	
+	<resultMap id="myPageResultSet" type="MyPage">
+		<result column="M.MEM_ID" property="memId" />
+		<result column="STORE_REVIEW" property="storeReview" />
+		<result column="PRODUCT_REVIEW" property="productReview" />
+		<result column="MPS_POINT" property="mpsPoint" />
+		<result column="STORE_SCRAP" property="storeScrap" />
+		<result column="FOLLOW" property="follow" />
+	</resultMap>
+	
+	<resultMap id="scrapResultSet" type="StoreScrap">
+		<result column="STORE_NAME" property="storeName" />
+		<result column="STORE_ADDRESS" property="storeAddress" />
+		<result column="RATE" property="reviewRate" />
+ 	</resultMap>
+	
+	<update id="updateMember" parameterType="Member">
+		UPDATE MEMBER
+		    SET MEM_PWD = #{memPwd}
+		      , MEM_NAME = #{memName}
+		      , MEM_PHONE = #{memPhone}
+		      , MEM_EMAIL = #{memEmail}
+		      , MEM_NICKNAME = #{memNickname}
+		      , MEM_IMGPATH = #{memImgPath}
+		      , ADDRESS_CODE = #{addressCode}
+		      , ADDRESS = #{address}
+		      , ADDRESS_DETAIL = #{addressDetail}
+		      , ADDRESS_REF = #{addressRef}
+		      , MEM_MODIFYDATE = SYSDATE
+		WHERE MEM_ID = #{memId}
+	</update>
+	
+	<update id="deleteMember" parameterType="Member">
+		UPDATE MEMBER
+		    SET MEM_STATUS = 'N'
+		      , WITHDRAW = #{withDraw}
+		WHERE MEM_ID = #{memId}
+	  	  AND MEM_PWD = #{memPwd}
+	</update>
+	
+	<select id="selectUpdateMember" parameterType="Member" resultMap="memberResultSet">
+		SELECT		
+		      MEM_NO
+			, MEM_ID
+			, MEM_PWD
+			, MEM_NAME
+			, MEM_PHONE
+			, MEM_EMAIL
+			, MEM_ENROLLDATE
+			, MEM_MODIFYDATE
+			, MEM_STATUS
+			, MEM_NICKNAME
+			, MEM_GRADE
+			, ADDRESS_CODE
+			, ADDRESS
+			, ADDRESS_DETAIL
+			, ADDRESS_REF
+			, MEM_IMGPATH
+			, WITHDRAW
+		FROM MEMBER
+		WHERE MEM_ID = #{memId}
+	</select>
+	
+	<select id="selectMyPage" parameterType="Member" resultMap="myPageResultSet">
+		SELECT 
+		    M.MEM_ID, <!-- 1. 로그인한 회원 아이디 -->
+		    (SELECT COUNT(REVIEW_WRITER) 
+		            FROM STORE_RE S 
+		    WHERE M.MEM_NO = S.REVIEW_WRITER) AS STORE_REVIEW, <!-- 2. 식당 리뷰 갯수 -->
+		    (SELECT COUNT(REVIEW_WRITER) 
+		            FROM PRODUCT_REVIEW P 
+		    WHERE M.MEM_NO = P.REVIEW_WRITER) AS PRODUCT_REVIEW, <!-- 3. 밀키트 리뷰 갯수 -->
+		    (SELECT SUM(MPS_RECORD) 
+		            FROM MPS_POINT MP 
+		    WHERE M.MEM_NO = MP.MEM_NO) AS MPS_POINT, <!-- 4. 적립금 총 금액 -->
+		    (SELECT COUNT(MEM_NO) 
+		            FROM STORE_SCRAP SS 
+		    WHERE M.MEM_NO = SS.MEM_NO) AS STORE_SCRAP, <!-- 5. 식당 스크랩 갯수 -->
+		    (SELECT COUNT(F_MNO) 
+		            FROM FOLLOW F 
+		    WHERE M.MEM_NO = F.F_MNO) AS FOLLOW <!-- 6. 팔로우한 인원 수 -->
+		FROM MEMBER M
+		WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+	</select>
+	
+	<select id="nickCheck" parameterType="Member" resultType="_int">
+		 SELECT 
+		       COUNT(*) AS "COUNT"
+		  FROM MEMBER
+		 WHERE MEM_NICKNAME = #{memNickname}
+	</select>
+	
+	<select id="selectNewPoint" parameterType="Point" resultMap="pointResultSet">
+		SELECT ROWNUM, A.* 
+		    FROM (
+		            SELECT MEM_ID
+		                 , MPS_CATEGORY
+		                 , MPS_RECORD
+		                 , MPS_STATUS
+		                 , SU_DATE
+		            FROM MPS_POINT
+		            JOIN MEMBER USING (MEM_NO)
+		            WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+		            ORDER BY SU_DATE DESC
+		        )A
+		WHERE ROWNUM BETWEEN 1 AND 2
+	</select>
+	
+	<select id="selectNewScrap" parameterType="StoreScrap" resultMap="scrapResultSet">
+		SELECT ROWNUM, A.*
+		    FROM (
+		        SELECT 
+		            (SELECT STORE_NAME <!-- 식당이름 -->
+		                FROM STORE S 
+		                WHERE SC.STORE_NO = S.STORE_NO) AS STORE_NAME,
+		            (SELECT STORE_ADDRESS <!-- 식당주소 -->
+		                FROM STORE S
+		                WHERE SC.STORE_NO = S.STORE_NO) AS STORE_ADDRESS,
+		            (SELECT AVG(REVIEW_RATE) <!-- 식당 평균 -->
+		                FROM STORE_RE SR
+		                WHERE SR.STORE_NO = SC.STORE_NO) AS RATE
+		        FROM STORE_SCRAP SC
+		        JOIN MEMBER USING (MEM_NO)
+		        WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+		        ORDER BY SCRAP_DATE DESC
+		        ) A
+		WHERE ROWNUM BETWEEN 1 AND 2
+	</select>
+
+</mapper>

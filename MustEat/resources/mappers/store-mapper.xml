@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="storeMapper">
+
+	<resultMap id="reviewResultSet" type="StoreReview">
+		<result column="REVIEW_TITLE" property="reviewTitle" />
+		<result column="STORE_NAME" property="storeName" />
+		<result column="REVIEW_ENROLLDATE" property="reviewEnrollDate" />
+	</resultMap>
+	
+	<select id="selectNewStoreReview" parameterType="StoreReview" resultMap="reviewResultSet">
+		SELECT ROWNUM, A.*
+			FROM (
+			        SELECT REVIEW_TITLE
+			             , STORE_NAME
+			             , REVIEW_ENROLLDATE
+			        FROM STORE_RE
+			        JOIN MEMBER ON (MEM_NO = REVIEW_WRITER)
+			        JOIN STORE USING (STORE_NO) 
+			        WHERE MEM_ID = #{memId} <!-- 로그인한 회원 아이디 -->
+			        ORDER BY REVIEW_ENROLLDATE DESC
+			    )A
+		WHERE ROWNUM BETWEEN 1 AND 2
+	</select>
+</mapper>

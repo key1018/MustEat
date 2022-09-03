@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	
+	<!-- 채윤 : 식당리뷰목록조회 -->
+	<entry key="selectStoreReviewList">
+	SELECT *
+	FROM (
+ 	SELECT ROWNUM RNUM, A.*
+ 	FROM (
+		SELECT
+		        RE_NO
+		       ,M.MEM_NICKNAME
+		       ,M.MEM_ID
+		       ,REVIEW_TITLE
+		       ,REVIEW_RATE
+		       ,REVIEW_ENROLLDATE
+		       ,M.MEM_GRADE
+		       ,COUNT
+		FROM STORE_RE SR
+		JOIN MEMBER M ON (SR.REVIEW_WRITER = M.MEM_NO)
+		WHERE REVIEW_STATUE ='Y'
+		ORDER
+    	      BY RE_NO DESC
+    	) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+    
+	</entry>
+	<!-- 채윤 식당 페이징... -->
+	<entry key="StoreReviewListCount">
+		SELECT
+		       COUNT(*) AS COUNT
+		  FROM STORE_RE
+	</entry>
+	
+	<!-- 채윤 : 식당 리뷰 검색 -->
+	<entry key="userStoreReview">
+		SELECT
+	        RE_NO
+	       ,M.MEM_NICKNAME
+	       ,M.MEM_ID
+	       ,REVIEW_TITLE
+	       ,REVIEW_RATE
+	       ,REVIEW_ENROLLDATE
+	       ,M.MEM_GRADE
+	       ,COUNT
+		FROM STORE_RE SR
+		JOIN MEMBER M ON (SR.REVIEW_WRITER = M.MEM_NO)
+	</entry>
+	
+	<!-- 채윤 : 식당 상세조회 -->
+	<entry key="selectStore">
+		SELECT 
+		       S.STORE_NO
+		     , STORE_NAME
+		     , STORE_ADDRESS
+		     , STORE_INTRO
+		     , STORE_IMG_PATH
+		     , STORE_POPULARITY
+		     , STORE_POP_INFO
+		     , STORE_POP_PATH
+		     , M.MEM_NICKNAME
+		     , REVIEW_CONTENT
+		     , REVIEW_IMG
+		  FROM STORE S
+		  JOIN STORE_RE SR ON (SR.STORE_NO = S.STORE_NO)
+		  JOIN MEMBER M ON(SR.REVIEW_WRITER = M.MEM_NO)
+		 WHERE S.STORE_NO = ?
+	</entry>
+	
+	<entry key="selectStore2">
+		SELECT STORE_NO 
+		     , STORE_NAME
+		     , STORE_ADDRESS
+		     , STORE_INTRO
+		     , STORE_IMG_PATH
+		     , STORE_POPULARITY
+		     , STORE_POP_INFO
+		     , STORE_POP_PATH
+		FROM STORE
+		WHERE STORE_NO = ?
+	</entry>
+	
+	<entry key="selectStoreReview">
+		SELECT RE_NO
+		      ,REVIEW_WRITER
+		      ,STORE_NO
+		      ,REVIEW_CONTENT
+		      ,REVIEW_RATE
+		      ,REVIEW_ENROLLDATE
+		      ,VISIT_DATE
+		      ,REVIEW_TITLE
+		      ,COUNT
+		FROM STORE_RE
+		WHERE STORE_NO = ?
+	</entry>
+	
+	<!-- 채윤 식당 조회수 -->
+	<entry key="increaseCount">
+		UPDATE STORE
+		   SET COUNT = COUNT+1
+		 WHERE STORE_NO = ?
+	</entry>
+	<!-- 채윤 에디터 조회수 -->
+	<entry key="increaseCountE">
+		UPDATE EDITOR
+		   SET COUNT = COUNT+1
+		 WHERE EDITOR_NO = ?
+	</entry>
+	<!-- 채윤 식당리뷰 조회수 -->
+	<entry key="increaseCountR">
+		UPDATE STORE_RE
+		   SET COUNT = COUNT+1
+		 WHERE RE_NO = ?
+	</entry>
+	
+	<!-- 채윤 식당 메인2 -->
+	<entry key="selectStoreList">
+		SELECT 
+			   STORE_NO
+		     , STORE_NAME
+		     , STORE_IMG_PATH
+		     , MEM_NICKNAME
+		     , REVIEW_CONTENT
+		     , REVIEW_IMG_PATH
+		  FROM STORE_RE
+		  JOIN MEMBER ON (REVIEW_WRITER = MEM_NO)
+		  JOIN STORE USING(STORE_NO)
+		 ORDER
+		    BY STORE_NO DESC
+	</entry>
+	
+	<entry key="mainpage">
+		SELECT 
+			   STORE_NO
+		     , STORE_NAME
+		     , STORE_IMG_PATH
+		     , MEM_NICKNAME
+		     , REVIEW_CONTENT
+		     , REVIEW_IMG_PATH
+		  FROM STORE_RE
+		  JOIN MEMBER ON (REVIEW_WRITER = MEM_NO)
+		  JOIN STORE USING(STORE_NO)
+		 ORDER
+		    BY STORE_NO DESC
+	</entry>
+	
+	
+	<entry key="forDetailList">
+		SELECT 
+		       S.STORE_NO
+		     , STORE_NAME
+		     , STORE_IMG_PATH
+		     , LOCAL_SI
+		     , STORE_ADDRESS
+		     , STORE_INTRO
+		     , STORE_IMG_PATH
+		     , STORE_POPULARITY
+		     , STORE_POP_INFO
+		     , STORE_POP_PATH
+		     , SR.RE_NO
+		 
+		  FROM STORE S
+           JOIN STORE_RE SR ON (SR.STORE_NO = S.STORE_NO)
+		 ORDER
+		 	BY S.STORE_NO DESC
+	</entry>
+	
+	<!-- 채윤 : 메인2 식당 검색 -->
+	<entry key="userStoreSearch">
+		SELECT
+	         S.STORE_NO
+		     , STORE_IMG_PATH
+		     , STORE_NAME
+		     , STORE_ADDRESS
+		     , STORE_INTRO
+		     , STORE_POPULARITY
+		     , STORE_POP_INFO
+		     , SR.REVIEW_CONTENT
+		     , SR.REVIEW_IMG
+		     , SR.REVIEW_WRITER
+		  FROM STORE S
+		  JOIN STORE_RE SR ON (SR.STORE_NO = S.STORE_NO)
+	</entry>
+	
+	<!-- 은영 -->
+	<entry key="selectNewStoreReview">
+	        		SELECT ROWNUM, A.*
+			FROM (
+			        SELECT REVIEW_TITLE
+			             , STORE_NAME
+			             , REVIEW_ENROLLDATE
+			        FROM STORE_RE
+			        JOIN MEMBER ON (MEM_NO = REVIEW_WRITER)
+			        JOIN STORE USING (STORE_NO) 
+			        WHERE MEM_ID = ? <!-- 로그인한 회원 아이디 -->
+			        ORDER BY REVIEW_ENROLLDATE DESC
+			    )A
+		WHERE ROWNUM BETWEEN 1 AND 2
+	</entry>
+	
+	<!-- 서원 관리자 식당 조회 -->
+	<entry key="selectAdminStorelist">
+		SELECT 
+			   STORE_NO
+			 , STORE_NAME
+			 , STORE_ADDRESS 
+			 , STORE_PHONE
+		  FROM STORE
+		 WHERE STORE_STATUS = 'Y'
+		 ORDER 
+            BY STORE_NO DESC
+	</entry>
+	
+	<!-- 채윤 썸머노트 -->
+	<entry key="insertEditor">
+	INSERT
+		  INTO EDITOR
+		  (
+		    EDITOR_NO
+		  , EDITOR_CONTENT
+		  , EDITOR_ATTACH
+		  )
+		  VALUES
+		  (
+		    SEQ_ENO.NEXTVAL
+		  , ?
+		  , ?
+		  )
+	</entry>
+	
+	<!-- 채윤 에디터글 조회 -->
+	<entry key="editorWritelist">
+		SELECT 
+			   EDITOR_NO
+			 , EDITOR_ATTACH
+		  FROM EDITOR
+	</entry>
+	
+	
+	<!-- 채윤 : 에디터글 상세조회 -->
+	<entry key="selectDetailEdior">
+		SELECT 
+		       EDITOR_NO
+			 , EDITOR_ATTACH
+			 , ENROLL_DATE
+			 , EDITOR_CONTENT
+	 	 FROM EDITOR
+		 WHERE EDITOR_NO = ?
+	</entry>
+	
+	<!-- 채윤 식당리뷰 등록 -->
+	<entry key="insertStoreReview">
+	INSERT
+		  INTO STORE_RE
+		  (
+		    RE_NO
+		  , STORE_NO
+		  , REVIEW_WRITER
+		  , REVIEW_TITLE
+		  , REVIEW_CONTENT
+		  , REVIEW_RATE
+		  , REVIEW_ENROLLDATE
+		  )
+		  VALUES
+		  (
+		    SEQ_RNO.NEXTVAL
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , SYSDATE
+		  )
+	</entry>
+	
+	
+	<!-- 채윤 식당 세션 -->
+	
+	<entry key="storeSession">
+		SELECT
+			   STORE_NO
+			 , LOCAL_SI
+			 , LOCAL_GU
+			 , LOCAL_RO
+			 , STORE_NAME
+			 , STORE_TAG
+			 , STORE_ADDRESS
+			 , STORE_PHONE
+			 , STORE_INTRO
+			 , STORE_IMG_PATH
+			 , STORE_POPULARITY
+			 , STORE_POP_INFO
+			 , STORE_POP_PATH
+			 , STORE_OPERATING
+			 , STORE_BREAKTIME
+			 , NAVER_ADDRESS
+			 , DAY_OFF
+			 , STORE_URL
+			 , STORE_ENROLLDATE
+			 , COUNT
+		  FROM STORE
+		 WHERE STORE_NAME=?
+		   AND STORE_NO=?
+	</entry>
+	
+	
+	<!-- 채윤 : 식당리뷰 상세조회 -->
+	<entry key="storeReviewDetail">
+		SELECT 
+			   RE_NO
+		     , REVIEW_TITLE
+			 , MEM_NICKNAME
+			 , REVIEW_IMG_PATH
+			 , REVIEW_CONTENT
+			 , REVIEW_ENROLLDATE
+			 , COUNT
+			 , mem_id
+	 	 FROM STORE_RE
+	 	 JOIN MEMBER ON(REVIEW_WRITER = MEM_NO)
+		WHERE RE_NO = ?
+	</entry>
+	
+	<!-- 서원 관리자 식당 등록 -->
+	<entry key="storelistInsert">
+		INSERT
+		  INTO STORE
+		     ( 
+		       STORE_NO
+		     , LOCAL_SI
+		     , LOCAL_GU
+		     , LOCAL_RO
+		     , STORE_NAME
+		     , STORE_TAG
+		     , STORE_ADDRESS
+		     , STORE_PHONE
+		     , STORE_INTRO
+		     , STORE_IMG_PATH
+		     , STORE_POPULARITY
+		     , STORE_POP_INFO
+		     , STORE_POP_PATH
+		     , STORE_OPERATING
+		     , STORE_BREAKTIME
+		     , NAVER_ADDRESS
+		     , DAY_OFF
+		     , STORE_URL
+		     , STORE_ENROLLDATE
+		     )
+		VALUES
+		     (
+		       SEQ_STORENO.NEXTVAL
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , SYSDATE   
+		     )
+	</entry>
+	
+	<!-- 서원 관리자 식당 상세 조회 -->
+	<entry key="selectStoreFormList">
+		SELECT 
+		 	   STORE_NO
+		 	 , LOCAL_SI
+		     , LOCAL_GU
+		     , LOCAL_RO
+		     , STORE_NAME
+		     , STORE_TAG
+		     , STORE_ADDRESS
+		     , STORE_PHONE
+		     , STORE_INTRO
+		     , STORE_IMG_PATH
+		     , STORE_POPULARITY
+		     , STORE_POP_INFO
+		     , STORE_POP_PATH
+		     , STORE_OPERATING
+		     , STORE_BREAKTIME
+		     , NAVER_ADDRESS
+		     , DAY_OFF
+		     , STORE_URL
+		     , STORE_ENROLLDATE
+		  FROM STORE
+		 WHERE STORE_NO = ?
+	</entry>
+	
+	<!-- 채윤 식당리뷰 세션 -->
+	
+	<entry key="storeReviewSession">
+		SELECT
+			   RE_NO
+			 , REVIEW_WRITER
+			 , STORE_NO
+			 , REVIEW_IMG
+			 , REVIEW_RATE
+			 , REVIEW_ENROLLDATE
+			 , REVIEW_MODIFYDATE
+			 , REVIEW_STATUE
+			 , REVIEW_IMG_PATH
+			 , VISIT_DATE
+			 , REVIEW_TITLE
+			 , COUNT
+			 , REVIEW_CONTENT
+			 , SR_CATEGORY
+		  FROM STORE_RE
+		 WHERE RE_NO=?
+	</entry>
+	
+	<!-- 서원 식당 수정 -->
+	<entry key="storelistUpdate">		
+		UPDATE STORE
+		   SET STORE_NAME = ?
+		     , STORE_TAG = ?
+		     , STORE_ADDRESS = ?
+		     , STORE_PHONE = ?
+		     , STORE_INTRO = ?
+		     , STORE_IMG_PATH = ?
+		     , STORE_POPULARITY = ?
+		     , STORE_POP_INFO = ?
+		     , STORE_POP_PATH = ?
+		     , STORE_OPERATING = ?
+		     , STORE_BREAKTIME = ?
+		     , NAVER_ADDRESS = ?
+		     , DAY_OFF = ?
+		     , STORE_URL = ?
+		 WHERE STORE_NO = ?	
+	</entry>
+	
+	<!-- 서원 식당 삭제 -->
+	<entry key="storelistDelete">
+		UPDATE STORE
+		   SET STORE_STATUS = 'N'
+		 WHERE STORE_NO = ?
+	</entry>
+	
+	<!-- 서원 사용자 식당 조회 -->
+	<entry key="storelistSearch">
+		SELECT
+			   STORE_NO
+		     , STORE_IMG_PATH
+		     , LOCAL_SI
+		     , LOCAL_GU
+		     , STORE_NAME
+		     , STORE_TAG
+		     , STORE_POPULARITY
+		     , STORE_OPERATING
+		     , STORE_BREAKTIME
+		  FROM STORE
+		 WHERE STORE_STATUS = 'Y'
+		 ORDER BY STORE_NAME ASC
+	</entry>
+	
+	<!-- 은영 (메인페이지 지역별 식당 조회) -->
+	<entry key="searchCity">
+	  SELECT STORE_NO
+       , STORE_NAME
+       , STORE_IMG_PATH
+       , LOCAL_SI
+       , LOCAL_GU
+	  FROM STORE
+	  WHERE LOCAL_SI LIKE ?
+	  	OR LOCAL_GU LIKE ?
+	</entry>
+	
+	<entry key="selectCity">
+	   	 SELECT 
+            LOCAL_SI
+          , LOCAL_GU
+          FROM STORE
+          WHERE LOCAL_SI LIKE ?
+            OR LOCAL_GU LIKE ?
+	</entry>
+	
+	<!-- 서원 식당검색 페이지 별점 조회 -->
+	<entry key="selectStoreRate">
+		SELECT
+		       AVG(REVIEW_RATE)
+		  FROM STORE_RE
+		  JOIN STORE S USING(STORE_NO)
+		 WHERE S.STORE_NO = ?
+	</entry>
+	
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@태민@@@@@@@@@@@@@@리뷰관리관리자 -->
+	
+	<!-- 태민 리뷰 회원번호별 조회 -->
+	<entry key="rselectList">
+			SELECT *
+		 FROM (
+            SELECT ROWNUM RNUM, A.*
+              FROM (
+             SELECT 
+                      SR.RE_NO
+					, SR.REVIEW_WRITER
+					, S.STORE_NO
+					, SR.REVIEW_CONTENT
+					, SR.REVIEW_IMG
+					, SR.REVIEW_RATE
+					, SR.REVIEW_ENROLLDATE
+					, SR.REVIEW_MODIFYDATE
+					, SR.REVIEW_STATUE
+					, SR.REVIEW_IMG_PATH
+					, SR.VISIT_DATE
+					, SR.REVIEW_TITLE
+					, SR.COUNT
+					, M.MEM_ID
+					, M.MEM_GRADE
+					, S.STORE_NAME
+					, M.MEM_NICKNAME
+              FROM STORE_RE SR 
+              JOIN MEMBER M ON (SR.REVIEW_WRITER = M.MEM_NO)
+              JOIN STORE S ON (SR.STORE_NO = S.STORE_NO)
+			 WHERE REVIEW_STATUE = 'Y'   
+             ORDER
+                BY RE_NO DESC
+            ) A
+        ) 
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+	<!-- 태민 리뷰 닉네임별 조회 -->
+	<entry key="rselectList1">
+			SELECT *
+		 FROM (
+            SELECT ROWNUM RNUM, A.*
+              FROM (
+             SELECT 
+                      SR.RE_NO
+					, SR.REVIEW_WRITER
+					, S.STORE_NO
+					, SR.REVIEW_CONTENT
+					, SR.REVIEW_IMG
+					, SR.REVIEW_RATE
+					, SR.REVIEW_ENROLLDATE
+					, SR.REVIEW_MODIFYDATE
+					, SR.REVIEW_STATUE
+					, SR.REVIEW_IMG_PATH
+					, SR.VISIT_DATE
+					, SR.REVIEW_TITLE
+					, SR.COUNT
+					, M.MEM_ID
+					, M.MEM_GRADE
+					, S.STORE_NAME
+					, M.MEM_NICKNAME
+              FROM STORE_RE SR 
+              JOIN MEMBER M ON (SR.REVIEW_WRITER = M.MEM_NO)
+              JOIN STORE S ON (SR.STORE_NO = S.STORE_NO)
+			 WHERE REVIEW_STATUE = 'Y'   
+             ORDER
+                BY MEM_NICKNAME ASC
+            ) A
+        ) 
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+	<!-- 태민 게시일별 조회 -->
+	<entry key="rselectList2">
+			SELECT *
+		 FROM (
+            SELECT ROWNUM RNUM, A.*
+              FROM (
+             SELECT 
+                      SR.RE_NO
+					, SR.REVIEW_WRITER
+					, S.STORE_NO
+					, SR.REVIEW_CONTENT
+					, SR.REVIEW_IMG
+					, SR.REVIEW_RATE
+					, SR.REVIEW_ENROLLDATE
+					, SR.REVIEW_MODIFYDATE
+					, SR.REVIEW_STATUE
+					, SR.REVIEW_IMG_PATH
+					, SR.VISIT_DATE
+					, SR.REVIEW_TITLE
+					, SR.COUNT
+					, M.MEM_ID
+					, M.MEM_GRADE
+					, S.STORE_NAME
+					, M.MEM_NICKNAME
+              FROM STORE_RE SR 
+              JOIN MEMBER M ON (SR.REVIEW_WRITER = M.MEM_NO)
+              JOIN STORE S ON (SR.STORE_NO = S.STORE_NO)
+			 WHERE REVIEW_STATUE = 'Y'   
+             ORDER
+                BY SR.REVIEW_ENROLLDATE DESC
+            ) A
+        ) 
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="rselectListCount">
+		<!-- 현재 리뷰 총 갯수 조회용 --> 
+		SELECT COUNT(*) as "COUNT"
+		 FROM STORE_RE SR 
+          JOIN MEMBER M ON (SR.REVIEW_WRITER = M.MEM_NO)
+          JOIN STORE S ON (SR.STORE_NO = S.STORE_NO)
+		WHERE REVIEW_STATUE = 'Y' 
+	</entry>
+	
+	
+	<!-- 태민 체크박스 체크된 리뷰 블랙리스트로 -->
+	<entry key="rwithdrawalMember">
+		UPDATE STORE_RE
+		   SET REVIEW_STATUE = 'N'
+		 WHERE RE_NO = ?
+		 
+	</entry>
+	
+	<!-- 서원 관리자 식당 검색 -->
+	<entry key="selectStoreAdminSearch">
+		SELECT
+		       STORE_NO
+		     , STORE_NAME
+		     , STORE_ADDRESS
+		     , STORE_PHONE
+		  FROM STORE
+	</entry>
+	
+	<!-- 서원 사용자 식당 검색 -->
+	<entry key="selectStorelistSearchForm">
+		SELECT
+			   STORE_NO
+		     , STORE_IMG_PATH
+		     , LOCAL_SI
+		     , LOCAL_GU
+		     , STORE_NAME
+		     , STORE_TAG
+		     , STORE_POPULARITY
+		     , STORE_OPERATING
+		     , STORE_BREAKTIME
+		  FROM STORE
+		 WHERE STORE_STATUS = 'Y'
+	</entry>
+	
+	<!-- 서원 관리자 식당 조회 페이징 처리 -->
+	<entry key="selectStoreAdminListCount">
+		SELECT
+		       COUNT(*) AS COUNT
+		  FROM STORE
+		 WHERE STORE_STATUS = 'Y'
+	</entry>
+	
+</properties>

@@ -1,0 +1,183 @@
+.basicInfo-area{
+    width:80%;
+    margin:auto;
+    border:1px solid rgba(221, 219, 219, 0.87);
+    background-color: white;
+    font-family: 'OTWelcomeRA';
+  }
+
+.basicInfoTitle{
+    background-color: rgb(167, 112, 239); 
+}
+
+.basicInfo{
+    color:white;
+    font-size:20px;
+    padding:10px;
+}
+
+.basicInfo>span>em{ color: orange; }
+
+.basicInfo>span{
+    font-size:12px;
+    float:right;
+    padding:7px 10px 10px 0px;
+}
+
+.updateInfo>th{
+    padding: 33px 0px 10px 110px;
+    width: 20%;
+    text-align: left;
+    font-size: 16px;
+}
+
+.updateInfo>td{
+    width:80%;
+    text-align:left;
+}
+
+.updateInfo input{
+    font-size: 15px;
+    width: 70%;
+    margin: 20px 10px 0px 15px;
+    height: 30px;
+}
+
+.updateInfo input[name=addressCode]{
+    width:25%;
+}
+
+.updateInfo input[name=userPhone2] {
+	width:35%;
+}
+
+.updateInfo select[name=bank] {
+    margin:20px 10px 0px 15px;
+    font-size:14.5px;
+    height: 30px;
+    width:25%;
+}
+
+.updateInfo input[name=addressDetail], .updateInfo input[name=addressRef] {
+    display: inline-block;
+ 	margin-bottom:20px;
+    width: 33.5%;
+}
+
+.updateInfo span{
+    font-size:12px;
+    color:gray;
+}
+
+.updateCheck{
+    font-size: 13px;
+    width: 130px;
+    height: 30px;
+    background-color: white;
+    line-height: 2px;
+}
+
+.addressCheck{
+    font-size: 13px;
+    width: 140px;
+    height: 30px;
+    background-color: white;
+    line-height: 2px;
+}
+
+#deleteModal .btn{
+    font-size:13px;
+    height: 35px;
+    line-height: 10px;
+}
+
+#deleteModal .btn:hover{
+    font-size:13px;
+    height: 35px;
+    line-height: 10px;
+    background-color: rgb(167, 112, 239);
+}
+
+#deleteModal b, #deleteModal div{
+    font-size:14.5px;
+}
+
+.memberDelete, .close{
+    background-color: black;
+    color:white;
+    text-align: left;
+}
+
+.deleteContent{
+    text-align:left;
+    padding:15px;
+    line-height:25px;
+    border:1px solid rgba(221, 219, 219, 0.87);
+}
+
+.deleteSelect{
+    text-align:left;
+    padding:15px;
+    line-height:25px;
+    display:flex;
+}
+
+.deleteSelect>span{
+    margin-right:20px;
+}
+
+.deleteReason>select{
+    width:220px;
+}
+
+.deleteCheck{
+    text-align:left;
+    display:flex;
+    padding: 15px 0px 5px 31px;
+    line-height: 25px;
+    border-top:1px solid black;
+}
+
+#alert-fail{
+	padding-left:31px;
+	color:red;
+	font-size:12px;
+}
+
+#deletePwd{
+    width:220px;
+    height:20px;
+    margin-left:10px;
+}
+
+.checkDouble{
+	font-size: 13px;
+    width: 105px;
+    height: 30px;
+    background-color: white;
+    line-height: 2px;
+}
+
+#short, #noneSign, #exist, #noneExist{
+	display:none;
+	font-size:12px;
+	color:red;
+	margin: 0px 15px;
+}
+
+
+#existIcon, #noneIcon{
+	width:140px;
+    height:140px;
+    margin:10px;
+    border: 2px solid white;
+	border-radius: 70px;
+}
+
+.basicProfile{
+	font-size:12px;
+	width:150px;
+	height:35px;
+}
+
+

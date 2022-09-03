@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL" /> <!-- DB에 null로 들어갈 때 오류 안나도록 설정 -->
+	</settings>
+	
+	<typeAliases> <!-- VO클래스들의 풀클래스명에 대한 별칭 설정 -->
+		<typeAlias type="com.mz.mybatis.member.model.vo.Member" alias="Member" />
+		<typeAlias type="com.mz.mybatis.member.model.vo.Point" alias="Point" />
+		<typeAlias type="com.mz.mybatis.member.model.vo.MyPage" alias="MyPage" />
+		<typeAlias type="com.mz.mybatis.member.model.vo.StoreScrap" alias="StoreScrap" />
+		<typeAlias type="com.mz.mybatis.product.model.vo.Product" alias="Product" />
+		<typeAlias type="com.mz.mybatis.product.model.vo.Basket" alias="Basket" />
+		<typeAlias type="com.mz.mybatis.product.model.vo.OrderPro" alias="OrderPro" />
+		<typeAlias type="com.mz.mybatis.product.model.vo.OrderDetail" alias="OrderDetail" />
+		<typeAlias type="com.mz.mybatis.product.model.vo.ProductReview" alias="ProductReview" />
+		<typeAlias type="com.mz.mybatis.store.model.vo.Store" alias="Store" />
+		<typeAlias type="com.mz.mybatis.store.model.vo.StoreReview" alias="StoreReview" />
+	</typeAliases>
+	
+	<!-- mybatis에서 연동할 DB정보들 등록하는 영역 -->
+	<!-- default : 기본적으로 연결할 설정 정보를 설정하는 속성 -->
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" /> <!-- 개발자가 직적 트랜잭션하도록 설정 -->
+			<dataSource type="POOLED"> <!-- ConnectionPool 사용 -->
+				<property name="driver" value="oracle.jdbc.driver.OracleDriver" />
+				<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe" />
+				<property name="username" value="MUSTEAT" />
+				<property name="password" value="MUSTEAT" />			
+			</dataSource>
+		</environment>
+		
+	</environments>
+
+	<!-- 실행할 sql문들을 담을 mapper파일 등록 -->
+	<mappers>
+		<mapper resource="/mappers/member-mapper.xml" />
+		<mapper resource="/mappers/product-mapper.xml" />
+		<mapper resource="/mappers/store-mapper.xml" />
+	</mappers>
+
+
+
+
+</configuration>
