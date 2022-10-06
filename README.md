@@ -38,6 +38,7 @@
 ## :star: 구현 기능
 
 ### :pushpin: 메인페이지
+![메인페이지](https://user-images.githubusercontent.com/103404357/194377780-00653c26-7c00-4c7a-aef2-c539121706eb.gif) <br>
 
 ### :pushpin: 마이페이지 
 
