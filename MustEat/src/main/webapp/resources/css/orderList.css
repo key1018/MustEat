@@ -88,7 +88,7 @@
 .goodsGroup{ margin:0px 30px; } 
 
 .goodsItem{
-	width:800px;
+	/* width:800px; */
 }
 
 .goodsPayItem{
@@ -129,9 +129,14 @@
     margin:5px 0px 12px;
 }
 
+.goodsList{
+	/* padding-left:100px; */
+}
+
 .goodsName{
     font-size:17px;
     color:black;
+    text-decoration:none;
     width:100%;
     margin: 7px 0px;
     overflow:hidden; /* 일정 글자수 초과하면 가려지기 */
@@ -142,6 +147,11 @@
 .goodsPrice{ color:black; }
 
 .goodsStatus, .goodsAmount, .goodsDate{color:gray;}
+
+.orderDate{
+	padding-left:20px;
+}
+
 
 .info>li{
     display:inline-block;

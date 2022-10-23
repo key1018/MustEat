@@ -1,109 +1,131 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="com.mz.mybatis.member.model.vo.*, java.text.DecimalFormat"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+	pageEncoding="UTF-8"
+	import="com.mz.mybatis.member.model.vo.*, java.text.DecimalFormat"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>회원 정보 수정</title>
-<link rel="stylesheet" type="text/css" href="${pageContext.servletContext.contextPath}/resources/css/memberUpdateForm.css" />
-<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/buttoncssNomal.css">
-<link rel="icon" type="image/png" sizes="32x32" href="${pageContext.servletContext.contextPath}/favicon-32x32.png">
+<link rel="stylesheet" type="text/css"
+	href="${pageContext.servletContext.contextPath}/resources/css/memberUpdateForm.css" />
+<link rel="stylesheet"
+	href="${pageContext.servletContext.contextPath}/resources/css/buttoncssNomal.css">
+<link rel="icon" type="image/png" sizes="32x32"
+	href="${pageContext.servletContext.contextPath}/favicon-32x32.png">
 </head>
 <body>
 
 	<jsp:include page="../common/menubar.jsp" />
 
 
-  <!-- 회원 정보 수정 창 -->
-    <div class="basicInfo-area">
+	<!-- 회원 정보 수정 창 -->
+	<div class="basicInfo-area">
 
-        <br>
-        <h3 align="center">회원 정보 수정</h3>
-        <br>
-        
-	<form action="update.me" class="userUpdateForm" method="post" enctype="multipart/form-data">
-	
-        <div class="basicInfoTitle" style="height:50px;">
-            <div class="basicInfo"><strong>기본정보</strong>
-            <span><em>*</em> 필수</span>
-            </div>
-        </div>  
+		<br>
+		<h3 align="center">회원 정보 수정</h3>
+		<br>
 
-            <table class="userUpdateInfo" width="100%">
-            
-                <tr class="updateInfo">
-                  <th>아이디</th>
-                  <td><input type="text" name="userId" value="${loginUser.memId }" readonly></td>
-                </tr>
-    
-                <tr class="updateInfo">
-                  <th>비밀번호</th>
-                  <td>
-                    <input type="password" name="updatePwd" id="pw" value="${loginUser.memPwd }" onchange="check_pw();" required>
-                  </td>
-                </tr>
-                
-                <tr>
-                	<th></th>
-                	<td>                  
-                    <p id="short" style="display:none; font-size:12px; color:red;">비밀번호는 8글자 이상, 20글자 이하만 이용 가능합니다.</p>
-                    <p id="noneSign" style="display:none; font-size:12px; color:red;">특수문자가 포함되어 있지 않습니다.</p>
-                    </td>
-                </tr>
+		<form action="update.me" class="userUpdateForm" method="post"
+			enctype="multipart/form-data">
 
-                <tr class="updateInfo">
-                  <th>비밀번호 확인</th>
-                  <td>
-                    <input type="password" name="checkPwd" id="pw" onchange="check_pw();" required >
-                  </td>
-                </tr>
-                
-                <tr class="updateInfo">
-                  <th>이름</th>
-                  <td><input type="text" name="userName" value="${loginUser.memName }" required></td>
-                </tr>
-                                
-                <tr class="updateInfo"> 
-                    <th>닉네임</th>
-                    <td><input type="text" id="nick" name="userNickname" value="${loginUser.memNickname }" required>
-                    	<input type="hidden" name="double" id="doubleNick" value="Y">
-                    	<button type="button" class="checkDouble btn1" onclick="checkNick();">중복확인</button>
-                    </td>
-                </tr>
-                
-                <tr>
-                	<th></th>
-                	<td>                  
-                    <p id="exist" style="display:none; font-size:12px; color:red;">이미 존재하거나 탈퇴한 회원의 닉네임입니다.</p>
-                    <p id="noneExist" style="display:none; font-size:12px; color:red;">사용가능한 닉네임 입니다.</p>
-                    </td>
-                </tr>
+			<div class="basicInfoTitle" style="height: 50px;">
+				<div class="basicInfo">
+					<strong>기본정보</strong> <span><em>*</em> 필수</span>
+				</div>
+			</div>
 
-                <tr class="updateInfo">
-                    <th>전화번호</th>
-                    <td><input type="text" name="phone" id="phone" value="${loginUser.memPhone }">
-                    	<input type="hidden" name="doublePhone" id="doublePhone" value="Y">
-                    	<button type="button" id="phoneChk" class="checkDouble btn1" onclick="phoneCheck();">본인인증</button>
-                    </td>
-                </tr>
-                
-                <tr class="updateInfo" id="show" style="display:none">
-                        <th></th>
-                        <td><input type="text" name="userPhone2" id="phone2" placeholder="인증번호를 입력해주세요">
-                       <span id="check2"></span>
-                        <button type="button" id="phoneChk2" class="checkDouble btn1" onclick="phoneCheck2();">인증확인</button></td>
-                </tr>
+			<table class="userUpdateInfo" width="100%">
 
-                <tr class="updateInfo">
-                    <th>이메일</th>
-                    <td><input type="email" id="email" name="email" value="${loginUser.memEmail }" required>
-                    	<input type="hidden" name="doubleCheck" id="doubleEmail" value="Y">
-                    	<button class="checkDouble btn1" type="button" onclick="checkEmail();">중복확인</button>
-                    </td>
-                </tr>
+				<tr class="updateInfo">
+					<th>아이디</th>
+					<td>
+						<input type="text" name="userId" value="${loginUser.memId }" readonly>
+					</td>
+				</tr>
 
-     <script>
+				<tr class="updateInfo">
+					<th>비밀번호</th>
+					<td>
+						<input type="password" name="updatePwd" id="pw" value="${loginUser.memPwd }" onchange="check_pw();" required>
+					</td>
+				</tr>
+
+				<tr>
+					<th></th>
+					<td>
+						<p id="short" style="display: none; font-size: 12px; color: red;">
+							비밀번호는 8글자 이상, 20글자 이하만 이용 가능합니다.
+						</p>
+						<p id="noneSign" style="display: none; font-size: 12px; color: red;">
+							특수문자가 포함되어 있지 않습니다.
+						</p>
+					</td>
+				</tr>
+
+				<tr class="updateInfo">
+					<th>비밀번호 확인</th>
+					<td>
+					 	<input type="password" name="checkPwd" id="pw" onchange="check_pw();" required>
+					</td>
+				</tr>
+
+				<tr class="updateInfo">
+					<th>이름</th>
+					<td>
+						<input type="text" name="userName" value="${loginUser.memName }" required>
+					</td>
+				</tr>
+
+				<tr class="updateInfo">
+					<th>닉네임</th>
+					<td>
+						<input type="text" id="nick" name="userNickname" value="${loginUser.memNickname }" required> 
+						<input type="hidden" name="double" id="doubleNick" value="Y">
+						<button type="button" class="checkDouble btn1" onclick="checkNick();">중복확인</button>
+					</td>
+				</tr>
+
+				<tr>
+					<th></th>
+					<td>
+						<p id="exist" style="display: none; font-size: 12px; color: red;">
+							이미 존재하거나 탈퇴한 회원의 닉네임입니다.
+						</p>
+						<p id="noneExist" style="display: none; font-size: 12px; color: red;">
+							사용가능한 닉네임입니다.
+						</p>
+					</td>
+				</tr>
+
+				<tr class="updateInfo">
+					<th>전화번호</th>
+					<td>
+						<input type="text" name="phone" id="phone" value="${loginUser.memPhone }"> 
+						<input type="hidden" name="doublePhone" id="doublePhone" value="Y">
+						<button type="button" id="phoneChk" class="checkDouble btn1" onclick="phoneCheck();">본인인증</button>
+					</td>
+				</tr>
+
+				<tr class="updateInfo" id="show" style="display: none">
+					<th></th>
+					<td>
+						<input type="text" name="userPhone2" id="phone2" placeholder="인증번호를 입력해주세요">
+						<span id="check2"></span>
+						<button type="button" id="phoneChk2" class="checkDouble btn1" onclick="phoneCheck2();">인증확인</button>
+					</td>
+				</tr>
+
+				<tr class="updateInfo">
+					<th>이메일</th>
+					<td>
+						<input type="email" id="email" name="email" value="${loginUser.memEmail }" required> 
+						<input type="hidden" name="doubleCheck" id="doubleEmail" value="Y">
+						<button class="checkDouble btn1" type="button" onclick="checkEmail();">중복확인</button>
+					</td>
+				</tr>
+
+	 <script>
                 
 	   // 이메일 변경시 실행할 함수
        $("#email").change(function() {
@@ -209,73 +231,80 @@
                check5 = 1;
            }
        }
-        </script>
+     </script>
 
-                <tr class="updateInfo">
-                    <th>주소</th>
-                    <td colspan="3">
-                                            
-                    	<c:choose>
-                    		<c:when test="${empty loginUser.addressCode }">
-                    			<input type="text" name="addressCode" id="sample6_postcode" placeholder="우편번호"> <button type="button" onclick="sample6_execDaumPostcode()" class="addressCheck btn1">우편번호 찾기</button>  <br>
-                    		</c:when>
-                    		<c:otherwise>
-                        		<input type="text" name="addressCode" id="sample6_postcode" placeholder="우편번호" value="${loginUser.addressCode }" > <button type="button" onclick="sample6_execDaumPostcode()" class="addressCheck btn1">우편번호 찾기</button>  <br>
-                        	</c:otherwise>
-                        </c:choose>
-                                                
-                        <c:choose>
-                        	<c:when test="${empty loginUser.address }">
-                       	 		<input type="text" name="address" id="sample6_address" placeholder="주소"><br>
-                       	 	</c:when>
-                       	 	<c:otherwise>
-                        		<input type="text" name="address" id="sample6_address" placeholder="주소" value="${loginUser.address }" ><br>
-                        	</c:otherwise>
-                        </c:choose>
-                                                
-                        <c:choose>
-                        	<c:when test="${empty loginUser.addressDetail }" >
-                        		<input type="text" name="addressDetail" id="sample6_detailAddress" placeholder="상세주소">
-                       		</c:when>
-                       		<c:otherwise>
-                        		<input type="text" name="addressDetail" id="sample6_detailAddress" placeholder="상세주소" value="${loginUser.addressDetail }" >
-                        	</c:otherwise>
-                        </c:choose>
-                                                
-                        <c:choose>
-                        	<c:when test="${empty loginUser.addressRef }" >
-                        		<input type="text" name="addressRef" id="sample6_extraAddress" placeholder="참고항목">
-                        	</c:when>
-                        	<c:otherwise>
-                        		<input type="text" name="addressRef" id="sample6_extraAddress" placeholder="참고항목" value="${loginUser.addressRef }" >
-							</c:otherwise>
-                        </c:choose>
-                    </td>
-                </tr>
+				<tr class="updateInfo">
+					<th>주소</th>
+					<td colspan="3">
+					<c:choose>
+						<c:when test="${empty loginUser.addressCode }">
+							<input type="text" name="addressCode" id="sample6_postcode" placeholder="우편번호">
+							<button type="button" onclick="sample6_execDaumPostcode()" class="addressCheck btn1">우편번호 찾기</button>
+							<br>
+						</c:when>
+						<c:otherwise>
+							<input type="text" name="addressCode" id="sample6_postcode" placeholder="우편번호" value="${loginUser.addressCode }">
+							<button type="button" onclick="sample6_execDaumPostcode()" class="addressCheck btn1">우편번호 찾기</button>
+							<br>
+						</c:otherwise>
+					</c:choose> 
+					
+					<c:choose>
+						<c:when test="${empty loginUser.address }">
+							<input type="text" name="address" id="sample6_address" placeholder="주소">
+							<br>
+						</c:when>
+						<c:otherwise>
+							<input type="text" name="address" id="sample6_address" placeholder="주소" value="${loginUser.address }">
+							<br>
+						</c:otherwise>
+					</c:choose> 
+					
+					<c:choose>
+						<c:when test="${empty loginUser.addressDetail }">
+							<input type="text" name="addressDetail" id="sample6_detailAddress" placeholder="상세주소">
+						</c:when>
+						<c:otherwise>
+							<input type="text" name="addressDetail" id="sample6_detailAddress" placeholder="상세주소" value="${loginUser.addressDetail }">
+						</c:otherwise>
+					</c:choose> 
+					
+					<c:choose>
+						<c:when test="${empty loginUser.addressRef }">
+							<input type="text" name="addressRef" id="sample6_extraAddress" placeholder="참고항목">
+						</c:when>
+						<c:otherwise>
+							<input type="text" name="addressRef" id="sample6_extraAddress" placeholder="참고항목" value="${loginUser.addressRef }">
+						</c:otherwise>
+					</c:choose>
+					</td>
+				</tr>
 
-                <tr class="updateInfo">
-	                <th>프로필 사진</th>
-	                <c:choose>
-	                	<c:when test="${not empty loginUser.memImgPath }">
-                    <td> <!-- 프로필 사진이 존재하는 경우 -->
-	                    <img src="${loginUser.memImgPath }" id="existIcon" onclick="chooseFile(1);">
-	                    <input type="hidden" id="hidden" name="profile" value="${loginUser.memImgPath }">
-	                    <input type="file" id="profile1" name="newProfile" value="" onchange="loadImg(this, 1);" style="display:none;">
-	                    <button type="button" class="btn1 basicProfile" onclick="removeImg();">기본프로필로 변경</button>
-                    </td>
-                    	</c:when>
-                    	<c:otherwise>
-                    <td> <!-- 프로필 사진이 없는 경우 -->
-	                    <img src="${pageContext.servletContext.contextPath}/resources/image/user.png" id="noneIcon" onclick="chooseFile(2);">
-	                    <input type="file" id="profile2" name="newProfile" onchange="loadImg(this, 2);" style="display:none;">
-                    </td>
-                    	</c:otherwise>
-                    </c:choose>
-                </tr>
-              
-              </table>
-              
-              <script>
+				<tr class="updateInfo">
+					<th>프로필 사진</th>
+					<c:choose>
+						<c:when test="${not empty loginUser.memImgPath }">
+							<td>
+								<!-- 프로필 사진이 존재하는 경우 --> 
+								<img src="${loginUser.memImgPath }" id="existIcon" onclick="chooseFile(1);">
+								<input type="hidden" id="hidden" name="profile" value="${loginUser.memImgPath }">
+								<input type="file" id="profile1" name="newProfile" value="" onchange="loadImg(this, 1);" style="display: none;">
+								<button type="button" class="btn1 basicProfile" onclick="removeImg();">기본프로필로 변경</button>
+							</td>
+						</c:when>
+						<c:otherwise>
+							<td>
+								<!-- 프로필 사진이 없는 경우 --> 
+								<img src="${pageContext.servletContext.contextPath}/resources/image/user.png" id="noneIcon" onclick="chooseFile(2);"> 
+								<input type="file" id="profile2" name="newProfile" onchange="loadImg(this, 2);" style="display: none;">
+							</td>
+						</c:otherwise>
+					</c:choose>
+				</tr>
+
+			</table>
+
+			<script>
               
       		// 미리보기 공간 클릭시 실행하는 함수
 
@@ -312,12 +341,13 @@
 
               
               </script>
-              
-              
 
 
-	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-	<script>
+
+
+			<script
+				src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+			<script>
 		
 	
 	    // 비밀번호 유효성검사
@@ -430,17 +460,20 @@
 	    }
 	</script>
 
-      <br>
+			<br>
 
-      <div align="center">
-        <button type="submit" class="updateCheck btn1" onclick="return updateMember();">회원정보수정</button>
-        <button type="button" class="updateCheck btn1" data-toggle="modal" data-target="#deleteModal">회원탈퇴</button>
-        <button type="button" class="updateCheck btn1" onclick="history.back();">취소</button>
-      </div>
+			<div align="center">
+				<button type="submit" class="updateCheck btn1"
+					onclick="return updateMember();">회원정보수정</button>
+				<button type="button" class="updateCheck btn1" data-toggle="modal"
+					data-target="#deleteModal">회원탈퇴</button>
+				<button type="button" class="updateCheck btn1"
+					onclick="history.back();">취소</button>
+			</div>
 
-    </form>
+		</form>
 
-    <script>
+		<script>
 
       function updateMember() {
     	  
@@ -462,76 +495,87 @@
 
     </script>
 
-    <br><br>
+		<br>
+		<br>
 
-    
-	<form action="/delete.me" method="get" id="delete-form">
-  <!-- 회원 탈퇴에 해당하는 Modal창 -->
-	<div class="modal" id="deleteModal">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	
-	      <!-- Modal Header -->
-	      <div class="modal-header memberDelete">
-	        <h4 class="modal-title">회원 탈퇴</h4>
-	        <button type="button" class="close" data-dismiss="modal" style="color:white;">&times;</button>
-	        <!-- 해당 버튼 클릭시 모달과 연결해제 -->
-	      </div>
-	
-	      <!-- Modal body -->
-	      <div class="modal-body" align="center">
-	      
-	        	<input type="hidden" name="userId" value="${loginUser.memId }">
-	        	
-	        	<%
+
+		<form action="/delete.me" method="get" id="delete-form">
+			<!-- 회원 탈퇴에 해당하는 Modal창 -->
+			<div class="modal" id="deleteModal">
+				<div class="modal-dialog">
+					<div class="modal-content">
+
+						<!-- Modal Header -->
+						<div class="modal-header memberDelete">
+							<h4 class="modal-title">회원 탈퇴</h4>
+							<button type="button" class="close" data-dismiss="modal"
+								style="color: white;">&times;</button>
+							<!-- 해당 버튼 클릭시 모달과 연결해제 -->
+						</div>
+
+						<!-- Modal body -->
+						<div class="modal-body" align="center">
+
+							<input type="hidden" name="userId" value="${loginUser.memId }">
+
+							<%
 	       			DecimalFormat df = new DecimalFormat("#,##0"); // 가격 천단위로 보여지도록 설정
 	       		%>
-				
-          <div class="deleteContent">
-            <b>혜택 내역</b>  <br> 
-            탈퇴하면 적립금이 삭제됩니다. <br>
-            현재 적립금 : ${myPage.mpsPoint }
-          </div>
 
-          <div class="deleteSelect">
+							<div class="deleteContent">
+								<b>혜택 내역</b> <br> 탈퇴하면 적립금이 삭제됩니다. <br> 현재 적립금 :
+								${myPage.mpsPoint }
+							</div>
 
-            <span><strong>회원 탈퇴 사유</strong></span>
+							<div class="deleteSelect">
 
-              <div class="deleteReason">
-                <select name="withdraw" required>
-                  <option value="맛집 및 상품 종류 부족">맛집 및 상품 종류 부족</option>
-                  <option value="상품 가격 불만족">상품 가격 불만족</option>
-                  <option value="서비스 이용 불편">서비스 이용 불편</option>
-                  <option value="방문 횟수 거의 없음">방문 횟수 거의 없음</option>
-                </select>
-            </div>
+								<span><strong>회원 탈퇴 사유</strong></span>
 
-          </div>
+								<div class="deleteReason">
+									<select name="withdraw" required>
+										<option value="맛집 및 상품 종류 부족">맛집 및 상품 종류 부족</option>
+										<option value="상품 가격 불만족">상품 가격 불만족</option>
+										<option value="서비스 이용 불편">서비스 이용 불편</option>
+										<option value="방문 횟수 거의 없음">방문 횟수 거의 없음</option>
+									</select>
+								</div>
 
+							</div>
+
+						</div>
+
+						<div class="deleteCheck">
+							<div>
+								<strong>비밀번호를 입력해주세요.</strong>
+							</div>
+							<div>
+								<input type="password" name="deletePwd" id="deletePwd">
+							</div>
+						</div>
+
+						<div id="alert-fail"
+							style="padding-left: 31px; font-size: 12px; color: red;">비밀번호를
+							잘못 입력하셨습니다. 다시 입력해주세요.</div>
+						<div id="alert-none"
+							style="padding-left: 31px; font-size: 12px; color: red;">비밀번호를
+							입력해주세요.</div>
+
+						<br>
+						<div align="center">
+							<button type="submit" class="plain-btn btn"
+								onclick="return deleteMember();">탈퇴하기</button>
+							<button type="button" class="plain-btn btn" data-dismiss="modal">취소</button>
+						</div>
+
+						<br>
+						<br>
+					</div>
 				</div>
-
-            <div class="deleteCheck">
-              <div><strong>비밀번호를 입력해주세요.</strong></div>
-              <div><input type="password" name="deletePwd" id="deletePwd"></div>
 			</div>
-			
-			 <div id="alert-fail" style="padding-left:31px; font-size:12px; color:red;">비밀번호를 잘못 입력하셨습니다. 다시 입력해주세요.</div>
-			 <div id="alert-none" style="padding-left:31px; font-size:12px; color:red;">비밀번호를 입력해주세요.</div>
 
-			<br>
-            <div align="center">
-              <button type="submit" class="plain-btn btn" onclick="return deleteMember();">탈퇴하기</button>
-              <button type="button" class="plain-btn btn" data-dismiss="modal">취소</button>
-            </div>
-            
-            <br><br>
-         </div>
-	  </div>
-	</div> 
+		</form>
 
-	        </form>
-	        
-	        <script>
+		<script>
 	       		 $("#alert-none").hide(); // 비밀번호 미입력 안내창 숨기기
 	        	 $("#alert-fail").hide(); // 비밀번호 불일치 안내창 숨기기
 	        	
@@ -550,8 +594,8 @@
 	        	}
 	        </script>
 
-	        
-	 		</div>
+
+	</div>
 
 
 </body>
