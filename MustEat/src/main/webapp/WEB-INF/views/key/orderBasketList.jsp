@@ -3,6 +3,7 @@
 	import="com.mz.mybatis.product.model.vo.*, java.util.ArrayList, java.text.DecimalFormat"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -105,16 +106,25 @@
 										
 										<div class="goodsItem">
 											<div class="goodsInfo" onclick="orderDetail();">
-												<a href="해당 상품 주문상세페이지" class="goods">
-													<p class="goodsName">${bk.productName }</p>
-													<ul class="info">
-														<li class="goodsPrice">${bk.price }원
-															<span class="goodsAmount">/ ${bk.count }개</span>
-														</li>
-														<li class="goodsDate" style="font-weight: bold;">${bk.basketDate }</li>
-													</ul>
-												</a> 
-												<span class="goodsStatus">구매 전</span>
+												<table class="goodsList">
+													<tr>
+														<td>
+															<a href="detail.pro?orderNo=${ol.orderNo }" class="goods"> 
+															<span class="goodsName">${bk.productName }</span>
+															</a>
+														</td>
+													</tr>
+													<tr>
+														<td class="goodsPrice">
+															<fmt:formatNumber value="${bk.price }" pattern="#,###" /> 
+															<span class="goodsAmount">/ ${bk.count }개</span> 
+															<span class="orderDate">${bk.basketDate }</span>
+														</td>
+													</tr>
+													<tr>
+														<td><span class="goodsStatus">구매 전</span></td>
+													</tr>
+												</table>
 											</div>
 										</div>
 
@@ -180,9 +190,6 @@
 			</div>
 		</c:forEach>
 		<!-- 바깥쪽 for문 끝-->
-		
-		
-		
 
 		<div class="line" style="border-bottom: 2px solid #ebe9e9;"></div>
 
@@ -194,7 +201,7 @@
 		</div>
 
 		<!-- 상품 '더보기' 영역!!! -->
-		<c:if test="${fn:length(basketList ) >= 8}">
+		<c:if test="${fn:length(basketList ) >= 3}">
 			<div class="viewMore">
 				<a href='#' id='load' class='btn1'>더 보기</a>
 			</div>

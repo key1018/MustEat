@@ -85,7 +85,9 @@
 }
 
 /* 주문 상품 */
-.goodsGroup{ margin:0px 30px; } 
+.goodsGroup{ 
+	/* margin:0px 30px; */
+} 
 
 .goodsItem{
 	/* width:800px; */
@@ -142,6 +144,10 @@
     overflow:hidden; /* 일정 글자수 초과하면 가려지기 */
     white-space:nowrap; /* 텍스트는 무조건 한 줄로 정렬 */
     text-overflow:ellipsis; /* 글자수 초과하면 밀줄임표로 가리기*/
+}
+
+.goodsName:hover{
+	text-decoration:none;
 }
 
 .goodsPrice{ color:black; }
